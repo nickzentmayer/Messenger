@@ -7886,6 +7886,12 @@
 		(uuid "fa7ecf12-1e4e-4fe0-890a-97f786ecd185")
 	)
 	(junction
+		(at 384.81 78.74)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fb7d2104-e8c8-44bc-9965-7a2ebad25fcd")
+	)
+	(junction
 		(at 160.02 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -8223,6 +8229,16 @@
 	)
 	(wire
 		(pts
+			(xy 384.81 78.74) (xy 384.81 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "122acb2a-172e-4d3a-9b36-573df2ae547f")
+	)
+	(wire
+		(pts
 			(xy 237.49 255.27) (xy 238.76 255.27)
 		)
 		(stroke
@@ -8523,6 +8539,16 @@
 	)
 	(wire
 		(pts
+			(xy 384.81 78.74) (xy 381 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "259dc144-fb09-4295-9905-e54cfc9f62c2")
+	)
+	(wire
+		(pts
 			(xy 66.04 80.01) (xy 66.04 81.28)
 		)
 		(stroke
@@ -8530,16 +8556,6 @@
 			(type default)
 		)
 		(uuid "28dd63ec-fbeb-4d66-ba4b-0ded1d86aba0")
-	)
-	(wire
-		(pts
-			(xy 374.65 82.55) (xy 374.65 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "28def2b4-fda0-4268-a2f2-3534d3cd71ee")
 	)
 	(wire
 		(pts
@@ -8923,7 +8939,7 @@
 	)
 	(wire
 		(pts
-			(xy 388.62 78.74) (xy 381 78.74)
+			(xy 388.62 78.74) (xy 384.81 78.74)
 		)
 		(stroke
 			(width 0)
@@ -9990,16 +10006,6 @@
 			(type default)
 		)
 		(uuid "91a04076-4b96-4c97-a972-fa7168f50bb8")
-	)
-	(wire
-		(pts
-			(xy 374.65 85.09) (xy 377.19 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "92e1c3ce-f678-41ab-8465-9360a227ec67")
 	)
 	(wire
 		(pts
@@ -16674,73 +16680,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_US")
-		(at 381 85.09 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "78637d0d-c36a-477c-b976-49990eea10a1")
-		(property "Reference" "R8"
-			(at 387.604 85.09 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "5.1k"
-			(at 381 87.122 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 380.746 86.106 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 381 85.09 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor, US symbol"
-			(at 381 85.09 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "1f0a45d3-cfbf-4f05-8825-1b6fdbb1e6a9")
-		)
-		(pin "1"
-			(uuid "d2fcf366-6927-4f1c-882a-2dddd1c378dd")
-		)
-		(instances
-			(project "messenger"
-				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8"
-					(reference "R8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 53.34 139.7 0)
 		(unit 1)
@@ -18378,72 +18317,6 @@
 			(project "messenger"
 				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8"
 					(reference "R19")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3V3")
-		(at 374.65 82.55 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a7fe5a10-a12e-4c91-aaf7-d047115ad940")
-		(property "Reference" "#PWR028"
-			(at 374.65 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 374.65 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 374.65 82.55 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 374.65 82.55 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3V3\""
-			(at 374.65 82.55 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "5b7bb396-553b-4363-9763-ac0f48d301a5")
-		)
-		(instances
-			(project "messenger"
-				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8"
-					(reference "#PWR028")
 					(unit 1)
 				)
 			)
