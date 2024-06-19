@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Guard")(type "KiCad")(uri "${KIPRJMOD}/Guard.pretty")(options "")(descr ""))
+)

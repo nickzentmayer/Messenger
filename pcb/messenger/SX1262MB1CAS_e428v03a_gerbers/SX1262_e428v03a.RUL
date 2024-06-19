@@ -1,0 +1,10 @@
+DRC Rules Export File for PCB: K:\users\marguier\pcb_altium\sx1261\sx1262_e428v03a\SX1262_e428v03a.PcbDoc
+RuleKind=Clearance|RuleName=Clearance_RF_GND|Scope=Board|Minimum=9.84
+RuleKind=Clearance|RuleName=Clearance_GND_Keepout|Scope=Board|Minimum=5.91
+RuleKind=ShortCircuit|RuleName=ShortCircuit|Scope=Board|Allowed=0
+RuleKind=Clearance|RuleName=Clearance|Scope=Board|Minimum=5.91
+RuleKind=Width|RuleName=Width All|Scope=Board|Minimum=5.00
+RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=1.97
+RuleKind=Width|RuleName=Width_VCC|Scope=Board|Minimum=7.87
+RuleKind=Width|RuleName=Width GND|Scope=Board|Minimum=7.87
+RuleKind=Clearance|RuleName=Clearance_GND|Scope=Board|Minimum=5.91
