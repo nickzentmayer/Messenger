@@ -1,4 +1,4 @@
-23380796843735022
+23387669704718533
 2450AT18D0100E
 2450AT18D0100E_JOT
 
@@ -67542,6 +67542,34 @@ DIL DIP PDIP 2.54mm 7.62mm 300mil
 0
 4
 4
+PE4259
+21-0555B_W80B1-1_MXM
+
+MAX17048X+T10 
+0
+8
+8
+PE4259
+SC-70-6_PSM
+
+4259-63 
+0
+6
+6
+PE4259
+SC-70-6_PSM-L
+
+4259-63 
+0
+6
+6
+PE4259
+SC-70-6_PSM-M
+
+4259-63 
+0
+6
+6
 Package_BGA
 Alliance_TFBGA-54_8x8mm_Layout9x9_P0.8mm
 Alliance TFBGA 54 pins, 8x8mm, 54 Ball, 9x9 Layout, 0.8mm Pitch, https://www.alliancememory.com/wp-content/uploads/pdf/dram/Alliance_Memory_64M-AS4C4M16SA-CI_v5.0_October_2018.pdf#page=54

@@ -1908,7 +1908,7 @@
 	)
 	(wire
 		(pts
-			(xy 232.41 55.88) (xy 232.41 58.42)
+			(xy 232.41 53.34) (xy 232.41 58.42)
 		)
 		(stroke
 			(width 0)
@@ -1938,6 +1938,16 @@
 	)
 	(wire
 		(pts
+			(xy 237.49 53.34) (xy 237.49 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b09dffa-7b1f-46da-8298-2fd6843c4d36")
+	)
+	(wire
+		(pts
 			(xy 121.92 62.23) (xy 133.35 62.23)
 		)
 		(stroke
@@ -1945,6 +1955,16 @@
 			(type default)
 		)
 		(uuid "1f216644-566e-46ba-ba0c-dc5ff79e00e1")
+	)
+	(wire
+		(pts
+			(xy 232.41 53.34) (xy 237.49 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "211a5f60-7205-4dc1-ad9a-25fa9bb3304d")
 	)
 	(wire
 		(pts
@@ -2378,7 +2398,7 @@
 	)
 	(wire
 		(pts
-			(xy 219.71 46.99) (xy 226.06 46.99)
+			(xy 218.44 46.99) (xy 226.06 46.99)
 		)
 		(stroke
 			(width 0)
@@ -3212,6 +3232,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3V3")
+		(at 218.44 46.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "23ea13ab-6da5-4b4a-bbf6-429adc2bd6b9")
+		(property "Reference" "#PWR072"
+			(at 218.44 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3_2"
+			(at 214.63 42.164 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 218.44 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 218.44 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 218.44 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "012f22c5-523b-46bb-8480-1b3a6fae649a")
+		)
+		(instances
+			(project "messenger"
+				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
+					(reference "#PWR072")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R_US")
 		(at 92.71 58.42 0)
 		(mirror y)
@@ -3282,72 +3368,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3V3")
-		(at 232.41 55.88 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "252248be-e1e9-42df-b5a8-46afafde9481")
-		(property "Reference" "#PWR048"
-			(at 232.41 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 232.41 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 232.41 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 232.41 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3V3\""
-			(at 232.41 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9e04ff3e-d29d-443a-bc8c-07044cd23434")
-		)
-		(instances
-			(project "messenger"
-				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
-					(reference "#PWR048")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R_US")
 		(at 87.63 64.77 270)
 		(unit 1)
@@ -3409,6 +3429,73 @@
 			(project "messenger"
 				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
 					(reference "R14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 237.49 52.07 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4fb5f406-0e6b-47e3-afa7-cd84921e97cf")
+		(property "Reference" "#PWR073"
+			(at 237.49 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3_2"
+			(at 240.03 50.7999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 237.49 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 237.49 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 237.49 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4979b7e5-f054-4a4b-85ab-c5fe85677cef")
+		)
+		(instances
+			(project "messenger"
+				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
+					(reference "#PWR073")
 					(unit 1)
 				)
 			)
@@ -3620,12 +3707,13 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3V3"
-			(at 92.71 39.37 0)
+		(property "Value" "+3V3_2"
+			(at 95.25 43.1799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property "Footprint" ""
@@ -4074,72 +4162,6 @@
 			(project "messenger"
 				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
 					(reference "#PWR043")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+3V3")
-		(at 219.71 46.99 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e1de2767-10ee-4b7f-8a2d-18098d95843b")
-		(property "Reference" "#PWR051"
-			(at 219.71 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 219.71 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 219.71 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 219.71 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3V3\""
-			(at 219.71 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "bfa091c9-556c-4485-9da6-131133c8c88a")
-		)
-		(instances
-			(project "messenger"
-				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8/5cc2afc1-567a-4d27-b7b0-7637ca20086c"
-					(reference "#PWR051")
 					(unit 1)
 				)
 			)
