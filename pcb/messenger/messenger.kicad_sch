@@ -7922,12 +7922,6 @@
 		(uuid "fa7ecf12-1e4e-4fe0-890a-97f786ecd185")
 	)
 	(junction
-		(at 384.81 78.74)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "fb7d2104-e8c8-44bc-9965-7a2ebad25fcd")
-	)
-	(junction
 		(at 160.02 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -8263,16 +8257,6 @@
 	)
 	(wire
 		(pts
-			(xy 384.81 78.74) (xy 384.81 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "122acb2a-172e-4d3a-9b36-573df2ae547f")
-	)
-	(wire
-		(pts
 			(xy 237.49 255.27) (xy 238.76 255.27)
 		)
 		(stroke
@@ -8593,29 +8577,6 @@
 	)
 	(wire
 		(pts
-<<<<<<< HEAD
-=======
-			(xy 384.81 85.09) (xy 386.08 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "24589aa7-6c22-4d3f-a9b7-f5cc3b765b33")
-	)
-	(wire
-		(pts
-			(xy 384.81 78.74) (xy 381 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "259dc144-fb09-4295-9905-e54cfc9f62c2")
-	)
-	(wire
-		(pts
->>>>>>> 3c7fbc4aba163d87e0826c354a075f42a6eba114
 			(xy 66.04 80.01) (xy 66.04 81.28)
 		)
 		(stroke
@@ -9016,7 +8977,7 @@
 	)
 	(wire
 		(pts
-			(xy 388.62 78.74) (xy 384.81 78.74)
+			(xy 388.62 78.74) (xy 381 78.74)
 		)
 		(stroke
 			(width 0)
@@ -17129,78 +17090,6 @@
 		)
 	)
 	(symbol
-<<<<<<< HEAD
-=======
-		(lib_id "Device:R_US")
-		(at 274.32 270.51 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "76f65670-a77a-49c6-ae22-d8ec75f4ed88")
-		(property "Reference" "R18"
-			(at 272.415 273.6849 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10k"
-			(at 272.415 276.2249 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 274.066 271.526 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 274.32 270.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor, US symbol"
-			(at 274.32 270.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f8baa38e-778e-4fdb-9373-dfc5268107e8")
-		)
-		(pin "2"
-			(uuid "f1e909bf-da63-4376-81e2-1c14f73b0c8c")
-		)
-		(instances
-			(project "messenger"
-				(path "/3c3794b6-df2c-4cf7-82cf-83f8f28f2ff8"
-					(reference "R18")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
->>>>>>> 3c7fbc4aba163d87e0826c354a075f42a6eba114
 		(lib_id "Device:C")
 		(at 53.34 139.7 0)
 		(unit 1)
