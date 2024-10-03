@@ -8,4 +8,5 @@
   (lib (name "PCA9554")(type "KiCad")(uri "${KIPRJMOD}/symbols/PCA9554.kicad_sym")(options "")(descr ""))
   (lib (name "TCA8418")(type "KiCad")(uri "${KIPRJMOD}/symbols/TCA8418.kicad_sym")(options "")(descr ""))
   (lib (name "Dummy")(type "KiCad")(uri "${KIPRJMOD}/symbols/Dummy.kicad_sym")(options "")(descr ""))
+  (lib (name "NCP186AMX330TAG")(type "KiCad")(uri "${KIPRJMOD}/symbols/NCP186AMX330TAG.kicad_sym")(options "")(descr ""))
 )
