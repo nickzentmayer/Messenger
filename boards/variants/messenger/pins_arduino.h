@@ -23,9 +23,9 @@ static const uint8_t LORA_IRQ = 16;
 static const uint8_t LORA_RST   = 10;
 static const uint8_t LORA_BUSY = 17;
 //Power
-static const uint8_t TFT_BACKLIGHT = 38;
-static const uint8_t LDO_EN = 14;
-static const uint8_t KEY_BACKLIGHT = 21;
+#define TFT_BACKLIGHT  GPIO_NUM_38
+#define LDO_EN  GPIO_NUM_14
+#define KEY_BACKLIGHT  GPIO_NUM_21
 
 //Other ESP Stuff
 // P1
