@@ -28,9 +28,9 @@ private:
     TFT_eSprite frame = TFT_eSprite(&tft);
     Icon icons[APP_COUNT] = {{"Messages", "/assets/messages.png"},
                  {"WiFi", "/assets/wifi-icon.png"},
-                 {"Debug", "/assets/debug.png"}}; 
+                 {"Debug", "/assets/debug.png"},
+                 {"Keyboard", "/assets/keyboard.png"}};
     uint64_t* statusTimer; // Timer to manage status updates
-
 };
 
 #endif

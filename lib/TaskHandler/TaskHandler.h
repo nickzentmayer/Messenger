@@ -41,7 +41,7 @@ class TaskHandler {
 public:
 TaskHandler();
 
-void addTask(TaskFunction_t function, const char* taskName, uint32_t stackDepth = 4096, UBaseType_t priority = 1, BaseType_t core = 0);
+void addTask(TaskFunction_t function, const char* taskName, uint32_t stackDepth = 4096, UBaseType_t priority = 2, BaseType_t core = 0);
 bool startTask(String taskName);
 bool pauseTask(String taskName);
 bool endTask(String taskName);

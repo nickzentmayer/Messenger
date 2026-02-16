@@ -6,6 +6,9 @@
 #include "power.h"
 #include "GPS.h"
 
+#define LOG_SIZE 100
+#define LOG_LINES 9
+
 class DebugApp : public AppBase {
     public:
     DebugApp(TaskHandler* handler) : AppBase(handler) {}
@@ -16,6 +19,16 @@ class DebugApp : public AppBase {
     private:
     uint64_t* statusTimer; // Timer to manage status updates
     TFT_eSprite frame = TFT_eSprite(&tft);
+    uint8_t* screen;
+    char* tempLog[7];
 };
+
+typedef struct {
+    volatile uint16_t write;
+    volatile uint16_t read;
+    char buffer[LOG_LINES][LOG_SIZE];
+} log_t;
+
+int ramLog(const char* msg, va_list va);
 
 #endif // DEBUG_H

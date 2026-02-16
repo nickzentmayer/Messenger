@@ -22,6 +22,12 @@
 
 #define LORA_ERR_BUSY 2 //Airspace is busy
 #define LORA_ERR_NO_ACK 3 //No acknowledgment received for the packet
+#define LORA_ERR_NONE 0 //Packet sent successfully
+#define LORA_UNSENT 127 //Packet has not been sent yet
+#define LORA_SENT_ACK 67 //Packet sent and acknowledged by application
+
+#define RECIEVE_TIMEOUT 5000 // Time to wait for all packets to be received in ms
+#define LORA_RETRY_AMOUNT 1
 
 struct LoRaMessage {
     String senderID;
@@ -29,9 +35,10 @@ struct LoRaMessage {
     String msg;
     int rssi;
     LoRaMessage* next;
-    LoRaMessage(String message) : msg(message), next(nullptr) {}
-    LoRaMessage(String message, int r) : msg(message), rssi(r), next(nullptr) {}
-    LoRaMessage() : senderID(""), recipient(""), msg(""), rssi(0), next(nullptr) {}
+    int8_t status;
+    LoRaMessage(String message) : msg(message), next(nullptr), status(127) {}
+    LoRaMessage(String message, int r) : msg(message), rssi(r), next(nullptr), status(127) {}
+    LoRaMessage() : senderID(""), recipient(""), msg(""), rssi(0), next(nullptr), status(127) {}
 };
 
 class LoRa {
@@ -44,13 +51,13 @@ public:
     static int transmitMessage(LoRaMessage& packet);
     static String receiveMessage(uint8_t numPackets, String radioID);
     static void radioSleep();
-    static int lastTransmitStatus;
 private:
     LoRa() = delete; // Prevent instantiation
     static void radioInteruptAction();
+    static void cleanQueue();
     static SX1262 radio;
     static TaskHandler* taskHandler;
-    static bool interuptFlag;
+    static volatile bool interuptFlag;
     static String radioID;
 };
 

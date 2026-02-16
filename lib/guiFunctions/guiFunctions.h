@@ -10,6 +10,7 @@
 #include "fonts/NotoSansBold15.h"
 #include "fonts/NotoSansBold36.h"
 #include "power.h"
+#include <WiFi.h>
 #include <time.h>
 
 #define FONT_SMALL NotoSansBold15

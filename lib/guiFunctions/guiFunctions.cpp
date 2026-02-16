@@ -75,17 +75,40 @@ TFT_eSprite renderPNG(String location) {
   return img;
 }
 
+void renderBars(TFT_eSprite* frame) {
+
+  frame->fillRoundRect(4, 10, 4, 5, 2, TFT_WHITE); // Always have 1 bar
+    //frame->drawString(String(rssi) + " dBm", tft.width() - 90, y);
+    //placeholder for less signal, will get overwritten if more bars are needed
+    //frame->fillRoundRect(11, 13, 4, 2, 2, TFT_YELLOW);
+    //frame->fillRoundRect(3, 13, 4, 2, 2, TFT_GREEN);
+    if(WiFi.RSSI() >= -85) {
+        frame->fillRoundRect(10, 6, 4, 9, 2, TFT_WHITE);
+    }
+    if(WiFi.RSSI() >= -75) {
+        frame->fillRoundRect(16, 0, 4, 15, 2, TFT_WHITE);
+    }
+}
+
 TFT_eSprite renderStatusBar() {
     TFT_eSprite statusBar = TFT_eSprite(&tft);
     statusBar.createSprite(tft.width(), 15);
     statusBar.fillSprite(TFT_BLACK);
     statusBar.loadFont(FONT_SMALL);
     statusBar.setTextColor(TFT_WHITE, TFT_BLACK);
+    String connectionType = "Offline";
+    if(WiFi.isConnected()) {
+      renderBars(&statusBar);
+    }
+    else {
+      statusBar.drawString(connectionType, 2, 2); //2 pixel padding from left and top
+    }
     //while(!semHandler->takeSemaphore("status", portMAX_DELAY));
     struct tm tmstruct ;
     getLocalTime(&tmstruct, 0);
     String timeString = "";
-    timeString += (tmstruct.tm_hour > 12) ? String(tmstruct.tm_hour - 12) + ":" : String(tmstruct.tm_hour) + ":";
+    if (tmstruct.tm_hour == 0) timeString += "12:";
+    else timeString += (tmstruct.tm_hour > 12) ? String(tmstruct.tm_hour - 12) + ":" : String(tmstruct.tm_hour) + ":";
     timeString += (tmstruct.tm_min < 10) ? "0" + String(tmstruct.tm_min) : String(tmstruct.tm_min);
     timeString += (tmstruct.tm_hour >= 12) ? " PM" : " AM";
     int centerX;
@@ -95,9 +118,9 @@ TFT_eSprite renderStatusBar() {
     statusBar.fillRoundRect(statusBar.width() - 7, 4, 5, 7, 2, TFT_WHITE);
     statusBar.drawRoundRect(statusBar.width() - 40, 0, 35, statusBar.height(), 3, TFT_WHITE);
     statusBar.fillRoundRect(statusBar.width() - 39, 1, 33, statusBar.height() - 2, 2, TFT_BLACK);
-    statusBar.fillRoundRect(statusBar.width() - 39, 1, map(batteryPercent, 0, 100, 0, 33), statusBar.height() - 2, 2, (batteryPercent < 20) ? TFT_RED : TFT_GREEN);
+    statusBar.fillRoundRect(statusBar.width() - 39, 1, map(Power::batteryPercent, 0, 100, 0, 33), statusBar.height() - 2, 2, (Power::batteryPercent < 20) ? TFT_RED : TFT_GREEN);
 
-    statusBar.drawString(String((int)batteryPercent) + "%", (statusBar.width() - 45) - statusBar.textWidth(String((int)batteryPercent) + "%"), 0);
+    statusBar.drawString(String((int)Power::batteryPercent) + "%", (statusBar.width() - 45) - statusBar.textWidth(String((int)Power::batteryPercent) + "%"), 0);
 
     //semHandler->releaseSemaphore("status");
     statusBar.unloadFont();

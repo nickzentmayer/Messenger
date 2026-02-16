@@ -11,15 +11,14 @@
 
 LoRaMessage* LoRa::packetReceiveQueue = nullptr;
 LoRaMessage* LoRa::packetTransmitQueue = nullptr;
-int LoRa::lastTransmitStatus = 69;
 SX1262 LoRa::radio = new Module(LORA_CS, LORA_DIO1, LORA_RST, LORA_BUSY);
 TaskHandler* LoRa::taskHandler = nullptr;
-bool LoRa::interuptFlag = false;
+volatile bool LoRa::interuptFlag = false;
 String LoRa::radioID;
 
 ICACHE_RAM_ATTR
 void LoRa::radioInteruptAction() {
-    log_d("Packet received");
+    //log_d("Interupt received");
     interuptFlag = true;
     radio.clearIrqFlags(radio.getIrqFlags() & (RADIOLIB_IRQ_SYNC_WORD_VALID | RADIOLIB_IRQ_PREAMBLE_DETECTED));
 }
@@ -30,7 +29,10 @@ void LoRa::loraTask(void *pvParameters) {
     // Initialize LoRa
     SPI.begin(11, 13, 12);
     radio.reset(true);
-    log_d("Lora.begin: %d", radio.begin(LORA_FREQ));
+    {
+    uint8_t state = radio.begin(LORA_FREQ);
+    log_d("Lora.begin: %d", state);
+    }
     radio.setDio2AsRfSwitch(true);
     radio.setSpreadingFactor(DEFAULT_SPREADING_FACTOR);
     radio.setBandwidth(DEFAULT_BANDWIDTH);
@@ -115,18 +117,33 @@ void LoRa::loraTask(void *pvParameters) {
             }
         }
         //TRANSMIT
-        if(packetTransmitQueue != nullptr) {
-            LoRaMessage* packet = packetTransmitQueue;
-            packetTransmitQueue = packetTransmitQueue->next; // Remove from queue
-            log_d("Transmitting packet to %s", packet->recipient.c_str());
-            lastTransmitStatus = transmitMessage(*packet);
-            log_d("Transmit status: %d", lastTransmitStatus);
-            if(lastTransmitStatus != RADIOLIB_ERR_NONE) {
-                log_e("Failed to transmit packet to %s, retrying...", packet->recipient.c_str());
-            } else {
-                log_d("Packet transmitted successfully");
+        cleanQueue();
+        LoRaMessage* packet = packetTransmitQueue;
+        while(packet != nullptr) {
+            if(packet->status != LORA_UNSENT) {
+                //log_d("Packet to %s already sent or in error state, skipping", packet->recipient.c_str());
+                packet = packet->next;
+                continue; // Skip already sent packets
             }
-            delete packet; // Free memory after successful transmission
+            uint8_t attempts = 0;
+            while(attempts < LORA_RETRY_AMOUNT) { // Try to send the packet up to 2 times
+            log_d("Transmitting packet to %s", packet->recipient.c_str());
+            packet->status = transmitMessage(*packet);
+            log_d("Transmit status: %d", packet->status);
+            attempts++;
+            if(packet->status == LORA_ERR_BUSY) {
+                log_d("Radio is busy, retrying...");
+                delay(2000); // Wait before retrying
+                radio.standby();
+                radio.clearIrqFlags(radio.getIrqFlags() & (RADIOLIB_IRQ_SYNC_WORD_VALID | RADIOLIB_IRQ_PREAMBLE_DETECTED));
+                
+            }
+            if(packet->status == RADIOLIB_ERR_NONE) {
+                log_d("Packet transmitted successfully");
+                break; // Successful transmission
+            }
+        }
+            packet = packet->next;
         }
         taskHandler->releaseSemaphore("radio");
         vTaskDelay(100 / portTICK_PERIOD_MS); // Polling delay
@@ -140,67 +157,83 @@ bool LoRa::isReceiving() {
 }
 
 int LoRa::transmitMessage(LoRaMessage& packet) {
-    int retryCount = 0;
-    while(isReceiving()) {
+    if(isReceiving()) {
         log_d("Radio is currently receiving, cannot transmit, retrying...");
-        vTaskDelay(RETRY_SEND_MS / portTICK_PERIOD_MS);
-        if(++retryCount >= RETRY_AMOUNT) {
-            log_e("Failed to transmit packet after %d attempts", RETRY_AMOUNT);
-            radio.clearIrqFlags(radio.getIrqFlags() & (RADIOLIB_IRQ_SYNC_WORD_VALID | RADIOLIB_IRQ_PREAMBLE_DETECTED));
-            //return LORA_ERR_BUSY;
-        }
+        return LORA_ERR_BUSY;
     }
+    log_d("Not reciving, preparing to transmit");
     String metadata = "HermesMeta:" + packet.recipient + ":" + radioID + ":";
     const int maxDataLength = 254 - String("HermesMsg:").length();
     const uint8_t amountOfPackets = (packet.msg.length() / maxDataLength) + 1;
     metadata += (char)amountOfPackets;
     //radio.clearDio1Action();
     int state = radio.startTransmit(metadata);
-    while(!interuptFlag) yield(); // Wait for transmission to complete
-    interuptFlag = false;
+     while(!interuptFlag) yield(); // Wait for transmission to complete
+     interuptFlag = false;
     if(state != RADIOLIB_ERR_NONE) return state;
     uint8_t packetNumber = 0;
-    log_d("Transmitting packet to %s, total length %d, will be sent in %d packets", packet.recipient.c_str(), packet.msg.length(), amountOfPackets);
+    String chunks[amountOfPackets]; //the stack is my best friend
     while(packet.msg.length() > maxDataLength) {
-        String chunk = packet.msg.substring(0, maxDataLength);
-        packet.msg.remove(0, maxDataLength);
-        state = radio.startTransmit("HermesMsg:" + char(packetNumber) + chunk);
+            chunks[packetNumber++] = packet.msg.substring(0, maxDataLength);
+            packet.msg.remove(0, maxDataLength);
+    }
+    chunks[packetNumber++] = packet.msg; // Last chunk
+    packetNumber = 1; // Reset for transmission
+    log_d("Transmitting packet to %s, total length %d, will be sent in %d packets", packet.recipient.c_str(), packet.msg.length(), amountOfPackets);
+        //send all packets
+    while(packetNumber <= amountOfPackets) {
+        //The first byte of the message data is not being sent?
+        String tmp = "HermesMsg:";
+        tmp += char(packetNumber);
+        tmp += chunks[packetNumber - 1];
+        log_d("Sending packet %d: %s", packetNumber, tmp.c_str());
+        state = radio.startTransmit(tmp);
+        packetNumber++;
         while(!interuptFlag) yield(); // Wait for transmission to complete
         interuptFlag = false;
         if(state != RADIOLIB_ERR_NONE) return state;
         delay(100); //give a "cooldown" period for the radio
     }
-        state = radio.startTransmit("HermesMsg:" + char(packetNumber) + packet.msg);
-        while(!interuptFlag) yield(); // Wait for transmission to complete
-        interuptFlag = false;
-        log_d("Waiting for acknowledgment for packet %d", packetNumber);
-        if(state != RADIOLIB_ERR_NONE) return state;
-    //wait for acknowledgment
+    //all packets sent, wait for acknowledgment
     radio.setDio1Action(radioInteruptAction);
     radio.startReceive();
-    
     uint64_t timeCounter = 0;
-    while(timeCounter < 3000) { // Wait for 3 seconds for acknowledgment
+    while(timeCounter < RECIEVE_TIMEOUT) { 
         if(interuptFlag) {
             interuptFlag = false;
-            String tmp;
+            String tmp = "";
             int state = radio.readData(tmp);
+            if(tmp.startsWith("Hermes:REQ:" + radioID)) { //we got something back, but we missed a packet
+                packetNumber = tmp.charAt(tmp.length() - 1); // Convert char to int
+                state = radio.startTransmit("HermesMsg:" + char(packetNumber) + chunks[packetNumber - 1]);
+                while(!interuptFlag) yield(); // Wait for transmission to complete
+                interuptFlag = false;
+                if(state != RADIOLIB_ERR_NONE) return state;
+                timeCounter = 0; // Reset timer to wait for missing packet
+            }
+            else if(tmp.equals("Hermes:ACK:" + radioID)) {
+                log_d("Acknowledgment received for transmission to %s, clean up and return", packet.recipient.c_str());
+                radio.setDio1Action(radioInteruptAction);
+                radio.startReceiveDutyCycleAuto(); // Return to receive mode
             return RADIOLIB_ERR_NONE;
         }  // Acknowledgment received
+    }
         timeCounter++;
         vTaskDelay(1 / portTICK_PERIOD_MS); // Polling delay
     }
-    log_e("No acknowledgment received for packet %d, giving up", packetNumber);
+    log_e("No acknowledgment received, giving up");
     radio.standby();
     radio.clearIrqFlags(radio.getIrqFlags() & (RADIOLIB_IRQ_SYNC_WORD_VALID | RADIOLIB_IRQ_PREAMBLE_DETECTED));
+    radio.setDio1Action(radioInteruptAction);
     radio.startReceiveDutyCycleAuto(); // Ensure radio is in receive mode
     return LORA_ERR_NO_ACK;
 }
 
-String LoRa::receiveMessage(uint8_t numPackets, String recipient) {
+String LoRa::receiveMessage(uint8_t numPackets, String from) {
     String payloads[numPackets];
     uint64_t timeCounter = 0;
-    while(timeCounter <= 5000) {
+    int16_t waitingOn = -2; //-1 means we have all packets, -2 means we havent requested any packets back yet
+    while(timeCounter <= RECIEVE_TIMEOUT && waitingOn != -1) {
             if(interuptFlag) {
                 interuptFlag = false;
                 timeCounter = 0; // Reset the timer if a packet is received
@@ -211,19 +244,28 @@ String LoRa::receiveMessage(uint8_t numPackets, String recipient) {
                     log_d("%s", payload.c_str());
                     payload = payload.substring(payload.indexOf(':') + 1); // Remove "HermesMsg:"
                     uint8_t packetNumber = payload.charAt(0); // Convert char to int
-                    payload = payload.substring(payload.indexOf(':')); // Remove packet number
+                    payload = payload.substring(payload.indexOf(':') + 1); // Remove packet number
                     if(packetNumber > numPackets) {
                         log_w("Received packet number %d, but only expecting %d packets", packetNumber, numPackets);
                         continue; // Ignore packets that are out of range
                     }
                     payloads[packetNumber - 1] = payload.substring(1); // Remove packet number
                     log_d("Received packet %d: %s", packetNumber, payload.c_str());
-                    if(packetNumber == numPackets) {
+                    if(packetNumber == numPackets || packetNumber == waitingOn) {
                         log_d("Received last packet");
                         for(int i = 0; i < numPackets; i++) {
-                            if(payloads[i].equals("")) delay(1); //TODO: Implement a way to ask for missing packets
+                            if(payloads[i].equals("")) {
+                                log_w("Missing packet %d, asking for it", i + 1);
+                                radio.startTransmit("Hermes:REQ:" + from + ":" + char(i + 1));
+                                //clear transmit interrupt
+                                while(!interuptFlag) yield(); // Wait for transmission to complete
+                                interuptFlag = false;
+                                timeCounter = 0; // Reset timer to wait for missing packet
+                                waitingOn = i + 1;
+                                break;
+                            } //TODO: Implement a way to ask for missing packets
+                            else if(i == numPackets - 1) waitingOn = -1; // We have all packets
                         }
-                        break;
                     }
             }
         }
@@ -231,11 +273,12 @@ String LoRa::receiveMessage(uint8_t numPackets, String recipient) {
         vTaskDelay(1);
     }
     //check for timeout, if we timed out return nothing
-    if(timeCounter == 100000) return "";
+    if(timeCounter >= RECIEVE_TIMEOUT) return "";
     String final = "";
     for(int i = 0; i < numPackets; i++) final += payloads[i];
     radio.clearDio1Action();
-    //radio.transmit("Hermes:ACK:" + recipient);
+    radio.transmit("Hermes:ACK:" + from); //Tell the transmitter we got the message, return them to receive mode
+    interuptFlag = false;
     radio.setDio1Action(radioInteruptAction);
     radio.startReceiveDutyCycleAuto();
     return final;
@@ -252,4 +295,32 @@ void LoRa::changeSettings(float freq, float bandwidth, uint8_t spreadingFactor, 
 void LoRa::radioSleep() {
     taskHandler->takeSemaphore("radio", portMAX_DELAY);
     radio.sleep();
+    taskHandler->releaseSemaphore("radio");
+}
+
+void LoRa::cleanQueue() {
+    // Clean up any acknowledged packets from the transmit queue
+    if(packetTransmitQueue == nullptr) return; //no packets in queue
+
+    //delete all packets at the front of the queue that have been acknowledged, stop at the first packet that is pending transmission or if we reach the end of the queue
+    while(packetTransmitQueue->status == LORA_SENT_ACK) {
+        log_d("Cleaning up acknowledged packet %x", packetTransmitQueue);
+        LoRaMessage* temp = packetTransmitQueue;
+        packetTransmitQueue = packetTransmitQueue->next;
+        delete temp;
+        if(packetTransmitQueue == nullptr) return;
+    }
+
+    if(packetTransmitQueue->next == nullptr) return; //only one packet in queue, and its pending or in error, so we can stop here
+    //delete packets after the first pending packet that have been acknowledged
+    LoRaMessage* current = packetTransmitQueue;
+    while(current->next != nullptr && current->next->status != LORA_UNSENT) {
+        if(current->next->status == LORA_SENT_ACK) {
+            LoRaMessage* temp = current->next;
+            current->next = current->next->next;
+            delete temp;
+        } else {
+            current = current->next;
+        }
+    }
 }

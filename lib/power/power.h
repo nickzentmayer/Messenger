@@ -6,16 +6,21 @@
 #include <Adafruit_MAX1704X.h>
 #include "LoRa.h"
 
-extern float batteryVoltage;
-extern float batteryPercent;
-extern float chargeRate;
 
-void devicesOn();
-void devicesOff();
-void changeBacklight(uint8_t brightness);
-void beginSleep();
-
-void pwrTask(void *pvParameters);
+class Power {
+    public:
+        Power() = delete; // Prevent instantiation
+        static void devicesOn();
+        static void devicesOff();
+        static void changeBacklight(uint8_t brightness);
+        static void beginSleep();
+        static void pwrTask(void *pvParameters);
+        static float batteryVoltage;
+        static float batteryPercent;
+        static float chargeRate;
+    private:
+        static TaskHandler *taskHandler;
+};
 
 
 #endif

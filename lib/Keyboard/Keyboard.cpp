@@ -36,7 +36,7 @@ void Keyboard::keyboardTask(void *pvParameters) {
             newKey->row = row;
             newKey->col = col;
             newKey->pressed = pressed;
-            log_d("Key event detected: ['%c']", keymap[col][row]);
+            log_d("Key event detected: ['%c']", Keymap[col][row]);
             while(!taskHandler->takeSemaphore("keyboardRW", portMAX_DELAY)) yield();
             if(keybInput == nullptr) keybInput = newKey;
             else {

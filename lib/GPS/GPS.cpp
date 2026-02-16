@@ -15,10 +15,13 @@ void GPS::gpsTask(void *pvParameters) {
         while(!taskHandler->takeSemaphore("gps", portMAX_DELAY));
         while(Serial1.available()) {
     char c = Serial1.read();
+    #ifdef GPS_DEBUG
+    Serial.write(c);
+    #endif
     gps.encode(c);
         }
         taskHandler->releaseSemaphore("gps");
-        if(gps.time.isUpdated()) {
+        if(gps.date.year() >= 2025) { //Dont lose esp's time if we dont have a fix (even tho the esp clock sucks)
             while(!taskHandler->takeSemaphore("status", portMAX_DELAY));
             //log_d("GPS Time: %02d:%02d:%02d", gps.time.hour(), gps.time.minute(), gps.time.second());
             struct tm t;
@@ -35,7 +38,7 @@ void GPS::gpsTask(void *pvParameters) {
 
             settimeofday(&now, NULL);
             
-
+            //gps.customElts
             taskHandler->releaseSemaphore("status");
         }
         vTaskDelay(500 / portTICK_PERIOD_MS); //Watchdog delay

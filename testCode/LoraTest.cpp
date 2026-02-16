@@ -5,6 +5,9 @@
 #include "Adafruit_MAX1704X.h"
 #include <RadioLib.h>
 #include <TinyGPS++.h>
+#include <WiFi.h>
+#include "TaskHandler.h"
+#include "LoRa.h"
 
 Adafruit_MAX17048 maxlipo;
 Adafruit_TCA8418 keypad;
@@ -57,6 +60,30 @@ void setup() {
     delay(2000);
   }*/
 
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(1000);
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+    Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " ": "*");
+      delay(10);
+    }
+  }
+  Serial.println("");
+
   tft.begin();
   tft.setRotation(1);
   tft.fillScreen(TFT_WHITE);
@@ -65,7 +92,7 @@ void setup() {
   Serial1.begin(9600);
   Serial1.setPins(44, 43);
 
-  //digitalWrite(21, LOW);
+  digitalWrite(21, LOW);
 
   SPI.begin(11, 13, 12);
   delay(2000);
@@ -80,17 +107,17 @@ void setup() {
    //radio.setSyncWord(0x69);
   radio.setRxBoostedGainMode(true);
   radio.setCurrentLimit(140);
-  radio.setTCXO(1.8);
+  radio.setTCXO(3.3);
   #ifndef TX
   radio.setPacketReceivedAction(setFlag);
   radio.startReceive();
   #endif
   // configure the size of the keypad matrix
   // all other pins will be inputs
-  keypad.matrix(ROWS, COLS);
+  //keypad.matrix(ROWS, COLS);
 
   // flush the internal buffer
-  keypad.flush();
+  //keypad.flush();
 }
 int count = 0;
 int channelDetected = -1;
@@ -117,6 +144,8 @@ void loop() {
     // you can read received data as an Arduino String
     String str;
     int state = radio.readData(str);
+    Serial.print(F("[SX1262] Reading packet ... "));  
+    Serial.println(str);
 
     // you can also read received data as byte array
     /*
@@ -148,25 +177,26 @@ void loop() {
       Serial.print(radio.getFrequencyError());
       Serial.println(F(" Hz"));
       static String myID;
-      if(str.startsWith("HermesMeta:")) {
+      if(str.startsWith("HermesMeta:")||str.startsWith("Hermes:ACK:")) {
         // this is a metadata packet, we can ignore it
         Serial.println(F("[SX1278] Metadata packet received!"));
-        str = str.substring(str.indexOf(':' +1));
-        Serial.print(F("[SX1278] To: "));
+        str = str.substring(str.indexOf(':') + 1);
+        Serial.print(String(F("[SX1278] To: ")) + str);
         Serial.println(str.substring(0, str.indexOf(':')));
         myID = str.substring(0, str.indexOf(':'));
         return;
       }
+      if(str.startsWith("HermesMsg:")) {
       radio.clearDio1Action();
-      Serial.println(radio.transmit("HermesACK:Nick:" + myID));
-      
+      Serial.println(radio.transmit("Hermes:ACK:Nick"));
       String payload = "HermesMeta:Nick:" + myID + ":";
       Serial.println(radio.transmit(payload + char(1)));
       payload = "HermesMsg:" ;
-      Serial.println(radio.transmit(payload + char(1) + str));
+      Serial.println(radio.transmit(payload + char(1) + str.substring(1)));
       delay(100);
       radio.setPacketReceivedAction(setFlag);
       radio.startReceive();
+      }
 
     } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
       // packet was received, but is malformed

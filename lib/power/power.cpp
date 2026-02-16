@@ -1,27 +1,29 @@
 #include "power.h"
 
-float batteryVoltage = 0.0;
-float batteryPercent = 0.0;
-float chargeRate = 0.0;
+float Power::batteryVoltage = 0.0;
+float Power::batteryPercent = 0.0;
+float Power::chargeRate = 0.0;
+TaskHandler* Power::taskHandler = nullptr;
 
-void devicesOn() {
+const uint8_t initRetrys = 3;
+
+void Power::devicesOn() {
     pinMode(LDO_EN, OUTPUT);
     digitalWrite(LDO_EN, HIGH);
-    pinMode(KEY_BACKLIGHT, OUTPUT);
     ledcSetup(0, 5000, 8); // Channel 0, 5kHz frequency, 8-bit resolution
-    ledcAttachPin(KEY_BACKLIGHT, 0); // Attach the pin to channel 0
-    ledcAttachPin(TFT_BACKLIGHT, 0); // Attach the TFT backlight pin to channel 0
-    ledcWrite(0, 0); // Set the backlight to maximum brightness (inverse logic)
+    ledcAttachPin(KEY_BACKLIGHT, 0); // Channel 0, 5kHz frequency, 8-bit resolution
+    ledcAttachPin(TFT_BACKLIGHT, 0); // Channel 0, 5kHz frequency, 8-bit resolution
+    ledcWrite(0, 255); // Set the backlight to maximum brightness (inverse logic)
 }
 
-void devicesOff() {
+void Power::devicesOff() {
     digitalWrite(LDO_EN, LOW);
 }
-void changeBacklight(uint8_t brightness) {
+void Power::changeBacklight(uint8_t brightness) {
     // Set the backlight brightness using PWM
     ledcWrite(0, 255 - brightness); // Inverse logic for brightness control
 }
-void beginSleep() {
+void Power::beginSleep() {
     //lora.sleep();
       esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, LOW);
     //   pinMode(KEY_BACKLIGHT, OUTPUT);
@@ -32,8 +34,8 @@ void beginSleep() {
       delay(100);
       esp_deep_sleep_start();
 }
-void pwrTask(void *pvParameters) {
-    TaskHandler* taskHandler = (TaskHandler *)pvParameters;
+void Power::pwrTask(void *pvParameters) {
+    taskHandler = (TaskHandler *)pvParameters;
     uint16_t timeCounter = 0;
     uint64_t batteryTimer = 0;
     bool batteryConnected = false;
@@ -44,16 +46,28 @@ void pwrTask(void *pvParameters) {
     Wire.begin();
     Adafruit_MAX17048 maxlipo;
     taskHandler->takeSemaphore("i2c", portMAX_DELAY);
-    if (!maxlipo.begin(&Wire, false)) 
-        log_e("Couldnt find MAX17048?\nMake sure a battery is plugged in!");
+    for(int i = 0; i < initRetrys; ++i) {
+        if (maxlipo.begin(&Wire, false)) {
+            batteryConnected = true;
+            break;
+        }
+        log_w("Couldn't find MAX17048? Retrying... (%d/%d)", i + 1, initRetrys);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    if (!batteryConnected) {
+        log_e("Couldn't find MAX17048?\nMake sure a battery is plugged in!");
+        batteryPercent = -1.0;
+        batteryVoltage = -1.0;
+    } 
     else {
-        batteryConnected = true;
         batteryPercent = (maxlipo.cellPercent() > 100.0) ? 100.0 : maxlipo.cellPercent();
         batteryVoltage = maxlipo.cellVoltage();
         chargeRate = maxlipo.chargeRate();
     }
     taskHandler->releaseSemaphore("i2c");
-    log_d("Powering Up");
+    log_d("Powered Up");
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    changeBacklight(255); // Turn backlight to max when key is pressed
     for(;;){
         while(!digitalRead(0) && timeCounter < 500) {
             timeCounter++;
@@ -77,9 +91,9 @@ void pwrTask(void *pvParameters) {
                 batteryVoltage = maxlipo.cellVoltage();
                 chargeRate = maxlipo.chargeRate();
                 taskHandler->releaseSemaphore("status");
-                log_d("Battery percent: %s", String(batteryPercent).c_str());
-                log_d("Battery voltage: %s", String(batteryVoltage).c_str());
-                log_d("Charge rate: %s", String(chargeRate).c_str());
+                //log_d("Battery percent: %s", String(batteryPercent).c_str());
+                //log_d("Battery voltage: %s", String(batteryVoltage).c_str());
+                //log_d("Charge rate: %s", String(chargeRate).c_str());
                 if (batteryVoltage < 3.3) {
                     log_w("Battery low, entering sleep mode");
                     taskHandler->takeSemaphore("powerSemaphore", portMAX_DELAY);

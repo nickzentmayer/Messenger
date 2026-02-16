@@ -1,5 +1,7 @@
 #include "messages.h"
 
+LoRaMessage* sentMessage = nullptr;
+
 void MessagesApp::start() {
     statusTimer = new uint64_t;
     recipientID = new String();
@@ -8,6 +10,8 @@ void MessagesApp::start() {
     frame.createSprite(tft.width(), tft.height());
     frame.loadFont(FONT_SMALL);
     frame.setTextColor(TFT_WHITE, TFT_BLACK);
+    update(' ', true, false); // Initial render
+    update('\b', true, false); // Initial render
 }
 
 void MessagesApp::update(char key, bool pressed, bool alt) {
@@ -19,33 +23,33 @@ void MessagesApp::update(char key, bool pressed, bool alt) {
         break;
 
         // Handle key presses for the messages app
-        case '\n': // Example key to send a message
+        case '\n': // key to send a message
             // Implement message sending logic here
             if(*appState == 0) *appState = 1;
             else {
-                LoRa::lastTransmitStatus = 69;
-                LoRaMessage* newMessage = new LoRaMessage{*message};
-                newMessage->recipient = *recipientID;
+                sentMessage = new LoRaMessage{*message};
+                sentMessage->recipient = *recipientID;
 
-                if(LoRa::packetTransmitQueue == nullptr) LoRa::packetTransmitQueue = newMessage;
+                if(LoRa::packetTransmitQueue == nullptr) LoRa::packetTransmitQueue = sentMessage;
                 else {
                     LoRaMessage* current = LoRa::packetTransmitQueue;
                     while(current->next != nullptr) current = current->next;
-                    current->next = newMessage;
+                    current->next = sentMessage;
                 }
                 tft.fillScreen(TFT_BLACK);
                 int x, y;
                 centerText("Sent '" + *message + "'!", &x, &y);
                 tft.drawString("Sent '" + *message + "'!", x, y);
-                while(LoRa::lastTransmitStatus == 69) delay(1);
-                centerText("Status: " + String(LoRa::lastTransmitStatus), &x, &y);
-                tft.drawString("Status: " + String(LoRa::lastTransmitStatus), x, y + 20);
+                while(sentMessage->status == LORA_UNSENT) delay(1);
+                centerText("Status: " + String(sentMessage->status), &x, &y);
+                tft.drawString("Status: " + String(sentMessage->status), x, y + 20);
+                sentMessage->status = LORA_SENT_ACK;
                 delay(2000);
                 frame.fillScreen(TFT_BLACK);
                 *appState = 0;
             }
             break;
-        case '<':
+        case '\b':
             if(*appState == 0) *recipientID = recipientID->substring(0, recipientID->length() - 1);
             else if(*appState == 1) *message = message->substring(0, message->length() - 1);
             break;

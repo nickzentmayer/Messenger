@@ -6,7 +6,7 @@
 #include <RadioLib.h>
 #include <WiFi.h>
 #include <TinyGPS++.h>
-#include <BleKeyboard.h>
+//#include <BleKeyboard.h>
 #include "LittleFS.h"
 
 Adafruit_MAX17048 maxlipo;
@@ -14,7 +14,7 @@ Adafruit_TCA8418 keypad;
 TFT_eSPI tft = TFT_eSPI();
 SX1262 lora = new Module(4, 16, 10, 17);
 TinyGPSPlus gps;
-BleKeyboard keyb;
+//BleKeyboard keyb;
 
 #define ROWS 7
 #define COLS 5

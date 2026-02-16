@@ -1,12 +1,12 @@
 #pragma once
 #ifndef APP_H
 #define APP_H
-
+#include <WiFi.h>
 #include <TFT_eSPI.h>
 #include "guiFunctions.h"
 #include "TaskHandler.h"
 
-#define APP_COUNT 3 // Number of apps in the system, home does not count
+#define APP_COUNT 4 // Number of apps in the system, home does not count
 
 extern TFT_eSprite bkg;
 
